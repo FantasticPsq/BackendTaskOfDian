@@ -78,7 +78,7 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -88,7 +88,7 @@
     </configuration>
     <configuration name="SimpleBlog" type="Python.FlaskServer">
       <module name="SimpleBlog" />
-      <option name="target" value="$PROJECT_DIR$/app.py" />
+      <option name="target" value="$PROJECT_DIR$/simple_blog.py" />
       <option name="targetType" value="PATH" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -121,7 +121,7 @@
       <workItem from="1589072982318" duration="58243000" />
       <workItem from="1589201166849" duration="24069000" />
       <workItem from="1589265237983" duration="2304000" />
-      <workItem from="1589272685432" duration="1393000" />
+      <workItem from="1589272685432" duration="1996000" />
     </task>
     <servers />
   </component>

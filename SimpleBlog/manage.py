@@ -3,7 +3,7 @@
 """
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from app import create_app
+from simple_blog import create_app
 from exts import db
 
 # 必须要导入模型才能迁移到数据库中
