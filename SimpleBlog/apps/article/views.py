@@ -1,7 +1,11 @@
-from flask import request
+from flask import request, redirect, url_for
 
 from flask import Blueprint, g
 
+from flask_paginate import get_page_parameter
+from sqlalchemy import or_
+
+import config
 from apps.user.verify_token import auth
 from config import ALL_METHODS
 from .forms import ArticlePublishForm, ArticleModifyForm, ArticleDeleteForm
@@ -11,6 +15,12 @@ from ..user.models import Article
 from apps.libs.dbsession import DBSession
 
 bp = Blueprint('article', __name__, url_prefix='/article')
+
+
+@bp.before_request
+def before_request():
+    global dbsession
+    dbsession = DBSession.make_session()
 
 
 @bp.route('/publish/', methods=ALL_METHODS)
@@ -24,7 +34,6 @@ def publish():
     """
     if request.method != 'POST':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    dbsession = DBSession.make_session()
     form = ArticlePublishForm()
     if form.validate_for_api() and form.validate():
         title = form.title.data
@@ -49,7 +58,6 @@ def modify():
     """
     if request.method != 'PUT':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    dbsession = DBSession.make_session()
     form = ArticleModifyForm()
     if form.validate_for_api() and form.validate():
         article_id = form.id.data
@@ -77,7 +85,6 @@ def delete():
     """
     if request.method != 'DELETE':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    dbsession = DBSession.make_session()
     form = ArticleDeleteForm()
     if form.validate_for_api and form.validate():
         article_id = form.id.data
@@ -90,6 +97,7 @@ def delete():
 
 
 @bp.route('/list_all/', methods=ALL_METHODS)
+@auth.login_required
 def list_all():
     """
     1.验证GET方法
@@ -98,16 +106,21 @@ def list_all():
     """
     if request.method != 'GET':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    dbsession = DBSession.make_session()
+    page = request.args.get(get_page_parameter(), default=1, type=int)
+    start = (page - 1) * config.PER_PAGE
+    end = start + config.PER_PAGE
+    if request.method != 'GET':
+        raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
     article_titles = []
-    articles = dbsession.query(Article).filter(Article.id).all()
+    articles = dbsession.query(Article).slice(start, end)
     if articles:
         for article in articles:
             article_titles.append(article.title)
-    return success(data={"all_articles": article_titles}, message="获取文章列表成功")
+    return success(data={"第%d页的文章" % page: article_titles}, message="获取文章列表成功")
 
 
-@bp.route('/details/<int:id_>',methods=ALL_METHODS)
+@bp.route('/details/<int:id_>', methods=ALL_METHODS)
+@auth.login_required
 def details(id_):
     """
     1.验证GET方法
@@ -116,11 +129,25 @@ def details(id_):
     """
     if request.method != 'GET':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    dbsession = DBSession.make_session()
     article = dbsession.query(Article).filter_by(id=id_).first()
+
     if article:
         title = article.title
         content = article.content
         return success(message="这是文章详情页", data={'文章标题': title, '文章内容': content})
     else:
         raise NotFound(msg='没有找到您要查看的文章')
+
+
+# @bp.route('/search/', methods=ALL_METHODS)
+# def query():
+#     if request.method != 'GET':
+#         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
+#     kw = request.args.get("kw")
+#     if not kw:
+#         return redirect(url_for('article.list_all') + "?blog_type=%s" % request.args.get("blog_type"))
+#     print(kw)
+#     content = dbsession.query(Article.title).filter(
+#         Article.title.like('%篇%')).all()
+#     print(content)
+#     return success(message="以上是为您搜索到的信息", data={"匹配的结果": content})

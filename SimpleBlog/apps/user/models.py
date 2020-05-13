@@ -22,7 +22,7 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(50), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    creat_time = db.Column(db.DateTime, default=datetime.now)
+    create_time = db.Column(db.DateTime, default=datetime.now)
     # 建立外键关联
     uid = db.Column(db.Integer, db.ForeignKey("user.id"))
     # 由于User和Article属于一堆多的关系，可通过relationship建立关系

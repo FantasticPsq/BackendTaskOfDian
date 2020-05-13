@@ -7,10 +7,16 @@ from apps.libs.restful import unauthorized_error, params_error, success
 from apps.libs.error_code import RequestMethodNotAllowed
 from config import ALL_METHODS
 
-# 用户蓝图，访问需加前缀/user
 from ..libs.dbsession import DBSession
 
+# 用户蓝图，访问需加前缀/user
 bp = Blueprint('user', __name__, url_prefix='/user')
+
+
+@bp.before_request
+def before_request():
+    global dbsession
+    dbsession = DBSession.make_session()
 
 
 @bp.route('/login/', methods=ALL_METHODS)
@@ -24,7 +30,6 @@ def login():
     print(request.method)
     if request.method != 'POST':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    dbsession = DBSession.make_session()
     form = LoginForm()
     if request.method == 'POST' and form.validate_for_api() and form.validate():
         user = dbsession.query(User).filter_by(email=form.email.data).first()
@@ -53,7 +58,6 @@ def register():
     print(request.method)
     if request.method.upper() != 'POST':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    dbsession = DBSession.make_session()
     form = RegisterForm()
     if form.validate_for_api() and form.validate():
         if form.validate_email(form.email):

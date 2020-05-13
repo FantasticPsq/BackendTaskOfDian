@@ -46,6 +46,7 @@ class Flask(_Flask):
 
 def create_app():
     """
+    产生app的工厂方法
     初始化app,配置，绑定数据库，以及注册蓝图等
     :return:
     """
