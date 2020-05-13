@@ -4,13 +4,15 @@ Created by 彭少青 on 2010/5/9 .
 """
 from datetime import date
 
-from flask import request, Flask as _Flask
+from flask import Flask as _Flask
 import config
 from apps.libs.error_code import ServerError
 from apps.user.views import bp
 from apps.article.views import bp as article_bp
 from exts import db
 from flask.json import JSONEncoder as _JSONEncoder
+# 只有导入模型，模型才能迁移至数据库
+import apps.user.models
 
 
 class JSONEncoder(_JSONEncoder):

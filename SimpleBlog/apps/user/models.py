@@ -1,5 +1,4 @@
 from sqlalchemy.orm import relationship
-from flask import request
 from exts import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -45,7 +44,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), nullable=False)
     _password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(25), nullable=False, unique=True)
+    email = db.Column(db.String(25), nullable=False)
     join_time = db.Column(db.DateTime, default=datetime.now)
 
     def __init__(self, username, password, email):

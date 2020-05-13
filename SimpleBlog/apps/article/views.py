@@ -1,18 +1,19 @@
-from flask import Blueprint, g, request
-from sqlalchemy.orm import sessionmaker
+from flask import request
+
+from flask import Blueprint, g
 
 from apps.user.verify_token import auth
+from config import ALL_METHODS
 from .forms import ArticlePublishForm, ArticleModifyForm, ArticleDeleteForm
-from ..libs.error_code import NotFound
+from ..libs.error_code import NotFound, RequestMethodNotAllowed
 from ..libs.restful import params_error, success
-from ..user.models import Article, User
-from exts import db
+from ..user.models import Article
 from apps.libs.dbsession import DBSession
 
 bp = Blueprint('article', __name__, url_prefix='/article')
 
 
-@bp.route('/publish/', methods=['POST'])
+@bp.route('/publish/', methods=ALL_METHODS)
 @auth.login_required
 def publish():
     """
@@ -21,6 +22,8 @@ def publish():
     返回success,否则返回参数错误
     :return: success or params_error
     """
+    if request.method != 'POST':
+        raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
     dbsession = DBSession.make_session()
     form = ArticlePublishForm()
     if form.validate_for_api() and form.validate():
@@ -36,7 +39,7 @@ def publish():
 
 
 # 修改指定为put方法
-@bp.route('/modify/', methods=["PUT"])
+@bp.route('/modify/', methods=ALL_METHODS)
 @auth.login_required
 def modify():
     """
@@ -44,6 +47,8 @@ def modify():
     2.JSON数据格式验证和表单验证，通过传进来的article_id查询原先的article,然后更改article信息
     :return: success 200 or params_error 400 or notfound 404
     """
+    if request.method != 'PUT':
+        raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
     dbsession = DBSession.make_session()
     form = ArticleModifyForm()
     if form.validate_for_api() and form.validate():
@@ -60,7 +65,7 @@ def modify():
         return params_error(message=form.get_error())
 
 
-@bp.route("/delete/", methods=['DELETE'])
+@bp.route("/delete/", methods=ALL_METHODS)
 @auth.login_required
 def delete():
     """
@@ -70,6 +75,8 @@ def delete():
     2.验证JSON数据格式和表单，通过传进来的article_id查询并删除article
     :return: success 200 or params_error 400
     """
+    if request.method != 'DELETE':
+        raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
     dbsession = DBSession.make_session()
     form = ArticleDeleteForm()
     if form.validate_for_api and form.validate():
@@ -82,13 +89,15 @@ def delete():
         return params_error(message=form.get_error())
 
 
-@bp.route('/list_all/', methods=['GET'])
+@bp.route('/list_all/', methods=ALL_METHODS)
 def list_all():
     """
     1.验证GET方法
     2.从数据库中把所有的数据查出来，然后保存在article_titles中，以标题代表文章
     :return: success 200
     """
+    if request.method != 'GET':
+        raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
     dbsession = DBSession.make_session()
     article_titles = []
     articles = dbsession.query(Article).filter(Article.id).all()
@@ -98,13 +107,15 @@ def list_all():
     return success(data={"all_articles": article_titles}, message="获取文章列表成功")
 
 
-@bp.route('/details/<int:id_>', methods=['GET'])
+@bp.route('/details/<int:id_>',methods=ALL_METHODS)
 def details(id_):
     """
     1.验证GET方法
     :param id_: 文章的id
     :return: success 200
     """
+    if request.method != 'GET':
+        raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
     dbsession = DBSession.make_session()
     article = dbsession.query(Article).filter_by(id=id_).first()
     if article:

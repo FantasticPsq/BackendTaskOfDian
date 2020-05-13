@@ -2,7 +2,7 @@
 error.py和error_code.py参考https://github.com/zhangnian/fastapi/tree/master/fastapi/utils
 本文件是从上面copy下来的，并稍作修改去掉error_code等
 """
-from flask import request, json
+from flask import json
 from werkzeug.exceptions import HTTPException
 
 
@@ -27,18 +27,11 @@ class APIException(HTTPException):
 
     def get_body(self, environ=None):
         body = dict(
-            msg=self.msg,
+            message=self.msg,
             code=self.code,
-            # request=request.method + " " + self.get_url_no_param()
         )
         text = json.dumps(body)
         return text
 
     def get_headers(self, environ=None):
         return [('Content-Type', 'application/json')]
-
-    # @staticmethod
-    # def get_url_no_param():
-    #     full_path = request.full_path
-    #     main_path = full_path.split('?')
-    #     return main_path[0]

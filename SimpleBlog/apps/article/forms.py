@@ -1,5 +1,5 @@
 from BaseForm import BaseForm
-from wtforms.validators import Email, InputRequired, Length
+from wtforms.validators import InputRequired
 from wtforms import StringField, IntegerField
 from flask import g
 

@@ -1,7 +1,6 @@
 """
  定义几个常用的HTTP类
 """
-from werkzeug.exceptions import HTTPException
 
 from apps.libs.error import APIException
 
@@ -37,6 +36,7 @@ class AuthFailed(APIException):
     msg = 'authorization failed'
 
 
-class Forbidden(APIException):
-    code = 403
-    msg = 'forbidden, not in scope'
+
+class RequestMethodNotAllowed(APIException):
+    code = 405
+    msg = "The method is not allowed for the requested URL"
