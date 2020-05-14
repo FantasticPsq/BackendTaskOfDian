@@ -42,5 +42,4 @@ class BaseForm(Form):
         self.errors经常要用到，get_error只是为了提取我们需要的错误信息
         :return:
         """
-        message = self.errors.popitem()[1][0]
-        return message
+        return self.errors.popitem()[1][0]

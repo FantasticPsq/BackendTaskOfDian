@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
-from Base import Base, db
+from Base import Base
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 

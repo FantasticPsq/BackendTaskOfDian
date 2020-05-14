@@ -1,11 +1,13 @@
 from contextlib import contextmanager
 
+from sqlalchemy import inspect, orm
+
 from apps.libs.error_code import NotFound
 
-from flask_sqlalchemy import BaseQuery, SQLAlchemy
+from flask_sqlalchemy import BaseQuery as _BaseQuery, SQLAlchemy
 
 
-class Query(BaseQuery):
+class BaseQuery(_BaseQuery):
     """
     1. 重写父类Query(object)中filter_by方法添加status参数添加到clause再执行filter方法：
     源码中是这样的：
@@ -20,20 +22,25 @@ class Query(BaseQuery):
     def filter_by(self, **kwargs):
         if 'status' not in kwargs.keys():
             kwargs['status'] = 1
-        return super(Query, self).filter_by(**kwargs)
+        return super(BaseQuery, self).filter_by(**kwargs)
 
     def get_or_404(self, ident, description=None):
         rv = self.get(ident)
         if not rv:
             raise NotFound()
+        return rv
 
     def first_or_404(self, description=None):
         rv = self.first()
         if not rv:
             raise NotFound()
+        return rv
+
+    def __call__(self, *args, **kwargs):
+        pass
 
 
-db = SQLAlchemy(query_class=Query)
+db = SQLAlchemy(query_class=BaseQuery)
 
 
 class Base(db.Model):

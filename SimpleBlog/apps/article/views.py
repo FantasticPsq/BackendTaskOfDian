@@ -1,10 +1,11 @@
-from flask import request, redirect, url_for
+from flask import request
 
 from flask import Blueprint, g
 
 from flask_paginate import get_page_parameter
 
 import config
+from Base import db
 from apps.user.verify_token import auth
 from config import ALL_METHODS
 from .forms import ArticlePublishForm, ArticleModifyForm, ArticleDeleteForm
@@ -20,13 +21,6 @@ bp = Blueprint('article', __name__, url_prefix='/article')
 def before_request():
     global dbsession
     dbsession = DBSession.make_session()
-
-
-# @bp.after_request
-# def after_request():
-#     dbsession = DBSession.make_session()
-#     with DBSession().auto_commit():
-#         pass
 
 
 @bp.route('/publish/', methods=ALL_METHODS)
@@ -93,7 +87,7 @@ def delete():
     form = ArticleDeleteForm()
     if form.validate_for_api and form.validate():
         article_id = form.id.data
-        article = dbsession.query(Article).filter_by(id=article_id).first()
+        article = dbsession.query(Article).get_or_404(article_id)
         article.delete()
         dbsession.commit()
         return success(message="删除文章成功",
@@ -137,8 +131,7 @@ def details(id_):
     """
     if request.method != 'GET':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    article = dbsession.query(Article).filter_by(id=id_).first_404()
-
+    article = dbsession.query(Article).filter_by(id=id_).first_or_404()
     if article:
         title = article.title
         content = article.content
