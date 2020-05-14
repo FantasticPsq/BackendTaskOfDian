@@ -3,7 +3,6 @@ from flask import request, redirect, url_for
 from flask import Blueprint, g
 
 from flask_paginate import get_page_parameter
-from sqlalchemy import or_
 
 import config
 from apps.user.verify_token import auth
@@ -21,6 +20,13 @@ bp = Blueprint('article', __name__, url_prefix='/article')
 def before_request():
     global dbsession
     dbsession = DBSession.make_session()
+
+
+# @bp.after_request
+# def after_request():
+#     dbsession = DBSession.make_session()
+#     with DBSession().auto_commit():
+#         pass
 
 
 @bp.route('/publish/', methods=ALL_METHODS)
@@ -78,7 +84,6 @@ def modify():
 def delete():
     """
     首先实现数据库层面的删除，有时间再优化
-
     1.验证请求方法是否为DELETE,再验证token
     2.验证JSON数据格式和表单，通过传进来的article_id查询并删除article
     :return: success 200 or params_error 400
@@ -89,9 +94,10 @@ def delete():
     if form.validate_for_api and form.validate():
         article_id = form.id.data
         article = dbsession.query(Article).filter_by(id=article_id).first()
-        dbsession.delete(article)
+        article.delete()
         dbsession.commit()
-        return success(message="删除文章成功")
+        return success(message="删除文章成功",
+                       data={"article_deleted": {"article_title": article.title, "article_content": article.content}})
     else:
         return params_error(message=form.get_error())
 
@@ -102,15 +108,17 @@ def list_all():
     """
     1.验证GET方法
     2.从数据库中把所有的数据查出来，然后保存在article_titles中，以标题代表文章
+    查询的数据分页展示
     :return: success 200
     """
+
     if request.method != 'GET':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
+    # 获取输入的page,默认为1
     page = request.args.get(get_page_parameter(), default=1, type=int)
+    # 计算起始页和结束页
     start = (page - 1) * config.PER_PAGE
     end = start + config.PER_PAGE
-    if request.method != 'GET':
-        raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
     article_titles = []
     articles = dbsession.query(Article).slice(start, end)
     if articles:
@@ -129,7 +137,7 @@ def details(id_):
     """
     if request.method != 'GET':
         raise RequestMethodNotAllowed(msg="The method %s is not allowed for the requested URL" % request.method)
-    article = dbsession.query(Article).filter_by(id=id_).first()
+    article = dbsession.query(Article).filter_by(id=id_).first_404()
 
     if article:
         title = article.title
@@ -137,7 +145,6 @@ def details(id_):
         return success(message="这是文章详情页", data={'文章标题': title, '文章内容': content})
     else:
         raise NotFound(msg='没有找到您要查看的文章')
-
 
 # @bp.route('/search/', methods=ALL_METHODS)
 # def query():

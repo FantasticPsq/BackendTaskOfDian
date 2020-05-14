@@ -36,7 +36,6 @@ class AuthFailed(APIException):
     msg = 'authorization failed'
 
 
-
 class RequestMethodNotAllowed(APIException):
     code = 405
     msg = "The method is not allowed for the requested URL"

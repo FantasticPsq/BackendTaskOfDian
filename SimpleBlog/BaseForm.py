@@ -9,7 +9,6 @@ class BaseForm(Form):
     """
     在Form的基础上添加一些常用功能
     参考https://www.cnblogs.com/zengxm/p/12406499.html
-
     """
 
     def __init__(self):

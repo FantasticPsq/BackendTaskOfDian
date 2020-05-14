@@ -8,7 +8,7 @@ from apps.libs.error_code import AuthFailed
 
 # 使用HTTPTokenAuth进行token验证，定义scheme为JWT
 auth = HTTPTokenAuth(scheme="JWT")
-# 定义namedtuple就不用在user模型中添加keys和__getitem__方法了
+# 定义namedtuple就不用在user模型中重写keys方法了
 # 可以通过属性的方式获取uid
 User = namedtuple('User', ['uid'])
 

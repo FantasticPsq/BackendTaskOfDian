@@ -1,13 +1,13 @@
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from exts import db
+
+from Base import Base, db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-bind_key = None
-
 
 # Article模型
-class Article(db.Model):
+class Article(Base):
     """
     表名article
     id:主键
@@ -18,19 +18,18 @@ class Article(db.Model):
     author:建立多对一关系，方便直接从文章获取作者信息
     """
     __tablename__ = 'article'
-    __bind_key__ = bind_key
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(50), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    create_time = db.Column(db.DateTime, default=datetime.now)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(50), nullable=False)
+    content = Column(Text, nullable=False)
+    create_time = Column(DateTime, default=datetime.now)
     # 建立外键关联
-    uid = db.Column(db.Integer, db.ForeignKey("user.id"))
+    uid = Column(Integer, ForeignKey("user.id"))
     # 由于User和Article属于一堆多的关系，可通过relationship建立关系
     # 其中关键字backref（反向引用）是为了方便User查找他的文章
     author = relationship("User", backref="articles")
 
 
-class User(db.Model):
+class User(Base):
     """
     表名user
     id:主键
@@ -39,13 +38,12 @@ class User(db.Model):
     email:邮箱
     join_time:用户注册时间
     """
-    __bind_key__ = bind_key
     __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(50), nullable=False)
-    _password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(25), nullable=False)
-    join_time = db.Column(db.DateTime, default=datetime.now)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(50), nullable=False)
+    _password = Column(String(100), nullable=False)
+    email = Column(String(25), nullable=False)
+    join_time = Column(DateTime, default=datetime.now)
 
     def __init__(self, username, password, email):
         self.username = username
