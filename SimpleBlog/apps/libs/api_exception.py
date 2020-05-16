@@ -1,5 +1,5 @@
 """
-error.py和error_code.py参考https://github.com/zhangnian/fastapi/tree/master/fastapi/utils
+api_exception.py和exceptions.py参考https://github.com/zhangnian/fastapi/tree/master/fastapi/utils的error和error_code文件
 """
 from flask import json
 from werkzeug.exceptions import HTTPException

@@ -3,7 +3,7 @@ from wtforms.validators import Email, InputRequired, Length
 
 from BaseForm import BaseForm
 from apps.user.models import User
-from apps.libs.error_code import ParameterException
+from apps.libs.exceptions import ParameterException
 
 
 class LoginForm(BaseForm):
@@ -12,7 +12,7 @@ class LoginForm(BaseForm):
     """
     email = StringField(
         validators=[Email(message="请输入正确的邮箱"), Length(6, 50, message="email"), InputRequired(message="请输入邮箱")])
-    password = StringField(validators=[Length(6, 20, message="请正确输入密码(长度"), InputRequired("请输入密码")])
+    password = StringField(validators=[Length(6, 20, message="请正确输入密码(长度范围为6,20"), InputRequired("请输入密码")])
 
 
 class RegisterForm(BaseForm):

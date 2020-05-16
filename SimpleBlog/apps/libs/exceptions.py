@@ -2,16 +2,17 @@
  定义几个常用的HTTP类
 """
 
-from apps.libs.error import APIException
+from apps.libs.api_exception import APIException
 
 
 class Success(APIException):
-    code = 201
+    code = 200
     msg = 'ok'
 
 
 class DeleteSuccess(Success):
-    code = 202
+    code = 201
+    msg = "服务器执行成功"
 
 
 class ServerError(APIException):

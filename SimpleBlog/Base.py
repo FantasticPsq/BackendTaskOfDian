@@ -1,8 +1,4 @@
-from contextlib import contextmanager
-
-from sqlalchemy import inspect, orm
-
-from apps.libs.error_code import NotFound
+from apps.libs.exceptions import NotFound
 
 from flask_sqlalchemy import BaseQuery as _BaseQuery, SQLAlchemy
 
@@ -10,7 +6,8 @@ from flask_sqlalchemy import BaseQuery as _BaseQuery, SQLAlchemy
 class BaseQuery(_BaseQuery):
     """
     1. 重写父类Query(object)中filter_by方法添加status参数添加到clause再执行filter方法：
-    源码中是这样的：
+    这样可以实现伪删除。
+    源码中filter_by是这样的：
     clauses = [
             _entity_descriptor(self._joinpoint_zero(), key) == value
             for key, value in kwargs.items()
@@ -27,23 +24,24 @@ class BaseQuery(_BaseQuery):
     def get_or_404(self, ident, description=None):
         rv = self.get(ident)
         if not rv:
-            raise NotFound()
+            raise NotFound(msg=description)
         return rv
 
     def first_or_404(self, description=None):
         rv = self.first()
         if not rv:
-            raise NotFound()
+            raise NotFound(msg=description)
         return rv
-
-    def __call__(self, *args, **kwargs):
-        pass
 
 
 db = SQLAlchemy(query_class=BaseQuery)
 
 
 class Base(db.Model):
+    """
+    自动为每个模型添加status状态，以实现伪删除或者其他功能。定义其为抽象类，
+    使其不能被实例化。
+    """
     __abstract__ = True
     status = db.Column(db.SmallInteger, default=1)
 
@@ -59,14 +57,4 @@ class Base(db.Model):
         self.status = 0
 
     def keys(self):
-        return self.fields
-
-    def hide(self, *keys):
-        for key in keys:
-            self.fields.remove(key)
-        return self
-
-    def append(self, *keys):
-        for key in keys:
-            self.fields.append(key)
-        return self
+        return self.feilds

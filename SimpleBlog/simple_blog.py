@@ -6,13 +6,11 @@ from datetime import date
 
 from flask import Flask as _Flask
 import config
-from apps.libs.error_code import ServerError
+from apps.libs.exceptions import ServerError
 from apps.user.views import bp
 from apps.article.views import bp as article_bp
 from exts import db
 from flask.json import JSONEncoder as _JSONEncoder
-# 只有导入模型，模型才能迁移至数据库
-import apps.user.models
 
 
 class JSONEncoder(_JSONEncoder):
@@ -46,15 +44,16 @@ class Flask(_Flask):
 
 def create_app():
     """
-    产生app的工厂方法
+    产生app的工厂方法，使用工厂函数方式创建 APP，更加符合规范，并且部署和测试也更加方便，灵活性也更加的高。
     初始化app,配置，绑定数据库，以及注册蓝图等
     :return:
     """
     app = Flask(__name__)
-
+    # 加载配置
+    app.config.from_object(config)
+    # 注册蓝图
     app.register_blueprint(bp)
     app.register_blueprint(article_bp)
-    app.config.from_object(config)
     # 数据库初始化app(相当于绑定数据库和app)
     db.init_app(app)
     return app
