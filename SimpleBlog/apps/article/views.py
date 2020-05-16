@@ -122,7 +122,7 @@ def list_all():
         for article in articles:
             if article.status == 1:
                 article_titles.append(article.title)
-    return Success(data={"第%d页的文章" % page: article_titles}, msg="获取文章列表成功")
+    return Success(data={"articles_in_page_%s" % page: article_titles}, msg="获取文章列表成功")
 
 
 @bp.route('/details/<int:id_>', methods=ALL_METHODS)
