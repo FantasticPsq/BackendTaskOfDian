@@ -53,7 +53,6 @@ def publish():
         return ParameterException(msg=form.get_errors())
 
 
-# 修改指定为put方法
 @bp.route('/modify/', methods=ALL_METHODS)
 @auth.login_required
 def modify():
@@ -103,7 +102,7 @@ def delete(id_):
 
 
 @bp.route('/list_all/', methods=ALL_METHODS)
-# @auth.login_required
+@auth.login_required
 def list_all():
     """
     1.验证token和GET方法
@@ -147,9 +146,8 @@ def details(id_):
 def query():
     """
     1.验证token和request method
-    2.获取查询字符串query_string
-    3，如果没有传进来kw,则默认分页显示所有文章
-    4.如果有kw，则查询显示所有文章（可通过title和content进行匹配)
+    2，如果没有传进来kw,则获取查询字符串query_string重定向到list_all默认分页显示所有文章
+    3.如果有kw，则查询显示所有文章（可通过title和content进行匹配)
     :return: success 200
     """
     validate_method("GET")

@@ -1,4 +1,4 @@
-from flask import request, g
+from flask import request
 from wtforms import Form
 
 from apps.libs.exceptions import ParameterException

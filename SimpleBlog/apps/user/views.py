@@ -40,7 +40,7 @@ def login():
         t = {
             'token': token.decode('ascii')
         }
-        return Success(data=t, msg="登录成功")
+        return Success(data=t, msg="登录成功", code=201)
     return AuthFailed(msg=form.get_errors())
 
 
@@ -64,4 +64,4 @@ def register():
             dbsession.add(user)
             dbsession.commit()
             return Success(msg="注册成功")
-    return ParameterException(msg=form.get_errors())
+    return ParameterException(msg=form.get_errors(), code=201)

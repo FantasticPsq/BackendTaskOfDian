@@ -31,7 +31,7 @@ ALL_METHODS = ['GET', 'POST', 'PUT', "DELETE", "HEAD"]
 # flask_paginate分页设置，设置每页展示的文章个数
 PER_PAGE = 3
 
-# 配置删除模式，一旦开启不管前端传不传delete_mode都将是永远删除。
+# 配置删除模式，一旦开启不管前端传不传delete_mode都将是永远删除。谨慎开启。
 DELETE_FOREVER = False
 
 
